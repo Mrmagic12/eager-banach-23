@@ -1,0 +1,38 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - run: |
+        gh issue --repo ${{github.repository}} \ create --title "Issue title" --body "Issue body"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag inventory:$(date +%s)
+      
+    - uses: itsvinayak/pylint-and-format@v1.1
+      with:
+        filename: 
+      
+    - uses: Somfic/cleanupcode-action@1.1.1
+      with:
+        solution:
+
+    - name: Code coverage-reporter
+      uses: tj-actions/coverage-reporter@v5
+      with:
+       token: ${{github.TOKEN}}
+       coverage-command: 
